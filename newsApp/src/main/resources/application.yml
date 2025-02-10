@@ -1,0 +1,67 @@
+server:
+  port: 8080
+spring:
+  cache:
+    type: caffeine # Use Caffeine cache
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10m # Max cache size and expiry
+  thymeleaf:
+    cache: false # Disable Thymeleaf cache for development
+  application:
+    name: "connection"
+  profiles:
+    active: "prod"
+  config:
+    import: "configserver:http://configserver:8071/"
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "guest"
+    password: "guest"
+
+
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO # Log level for the entire application
+    com.demo: DEBUG # Log level for the application's base package
+
+# Exception Handling Configuration
+  error:
+    include-message: always # Include error messages in the response for debugging
+    include-binding-errors: always
+    include-stacktrace: ON_PARAM # Fixed value
+
+
+# Spring Boot Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # Expose all actuator endpoints
+    health:
+      probes:
+        enabled: true
+    metrics:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always # Display detailed health information in /actuator/health
+
+
+
+# Monitoring and Observability (Optional but Useful)
+micrometer:
+  metrics:
+    export:
+      prometheus:
+        enabled: true # Enable Prometheus metrics for monitoring

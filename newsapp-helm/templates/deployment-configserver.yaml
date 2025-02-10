@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configserver
+  template:
+    metadata:
+      labels:
+        app: configserver
+    spec:
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox
+          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 5; done']
+      containers:
+        - name: configserver
+          image: "{{ .Values.configserver.image }}"
+          ports:
+            - containerPort: {{ .Values.configserver.service.port | int }}
+          envFrom:
+            - configMapRef:
+                name: newsapp-config
+            - secretRef:
+                name: newsapp-secret
+          readinessProbe:
+            httpGet:
+              path: "/actuator/health"
+              port: {{ .Values.configserver.service.port | int }}
+            initialDelaySeconds: 75  # Increased to 60s
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 6

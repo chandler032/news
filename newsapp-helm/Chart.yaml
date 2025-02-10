@@ -1,0 +1,6 @@
+apiVersion: v2
+name: newsapp
+description: A Helm chart for News App with ConfigServer & RabbitMQ
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

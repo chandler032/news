@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newsgroup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: newsgroup
+  template:
+    metadata:
+      labels:
+        app: newsgroup
+    spec:
+      initContainers:
+        - name: wait-for-configserver
+          image: busybox
+          command: [ 'sh', '-c', 'until wget -qO- http://configserver.default.svc.cluster.local:8071/actuator/health | grep -q UP; do echo waiting for configserver; sleep 5; done' ]
+      containers:
+        - name: newsgroup
+          image: "{{ .Values.newsgroup.image }}"
+          ports:
+            - containerPort: {{ .Values.newsgroup.service.port | int }}
+          envFrom:
+            - configMapRef:
+                name: newsapp-config
+            - secretRef:
+                name: newsapp-secret

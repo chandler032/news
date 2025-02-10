@@ -1,0 +1,32 @@
+deplicaCount: 1
+
+rabbitmq:
+  image: rabbitmq:3.13-management
+  service:
+    name: rabbitmq
+    port: 5672
+    managementPort: 15672
+
+configserver:
+  image: chandler032/configserver
+  tag: latest
+  service:
+    name: configserver
+    port: 8071
+
+newsgroup:
+  image: chandler032/newsgroup
+  tag: latest
+  service:
+    name: newsgroup
+    port: 8080
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+  CONFIGSERVER_URI: "http://configserver:8071"
+  SPRING_RABBITMQ_HOST: "rabbitmq"
+  SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
+
+ingress:
+  enabled: false
+  host: newsapp.local
